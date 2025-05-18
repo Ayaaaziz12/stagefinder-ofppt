@@ -13,6 +13,7 @@ class SignupController extends Controller
 {
     public function register(Request $request)
     {
+        // dd($request);
         $request->validate([
             'student_checkbox' => 'sometimes|boolean',
             'company_checkbox' => 'sometimes|boolean',
@@ -21,14 +22,17 @@ class SignupController extends Controller
             'first_name' => 'required_if:student_checkbox,true|string',
             'last_name' => 'required_if:student_checkbox,true|string',
             'email' => 'required_if:student_checkbox,true|email|unique:students,email',
-            'password' => 'required|string|confirmed',
+            'password' => 'required_if:student_checkbox,true||string|confirmed',
             'phone' => 'required_if:student_checkbox,true|string',
 
             // Company fields
             'name' => 'required_if:company_checkbox,true|string',
-            'rc' => 'required_if:company_checkbox,true|string|unique:companies,rc', // Replace `rc` with your company's RC column name
+            'rc' => 'required_if:company_checkbox,true|string|unique:companies,id_rc', // Replace `rc` with your company's RC column name
             'company_password' => 'required_if:company_checkbox,true|string|confirmed',
+            'email' => 'required_if:company_checkbox,true|email|unique:companies,email',
+            'domain' => 'required_if:company_checkbox,true|string'
         ]);
+
 
         // Validate checkbox exclusivity
         if ($request->student_checkbox && $request->company_checkbox) {
@@ -51,23 +55,25 @@ class SignupController extends Controller
             return response()->json([
                 'message' => 'Student registered successfully',
                 'student' => $student,
-                'token' => $student->createToken('student-token')->plainTextToken,
+                // 'token' => $student->createToken('student-token')->plainTextToken,
             ]);
         }
-
         // Register Company
         if ($request->company_checkbox) {
             $company = Company::create([
                 'name' => $request->name,
-                'rc' => $request->rc,
+                'id_rc' => $request->rc,
                 'password' => Hash::make($request->company_password),
+                'email' => $request->email,
+                'domain' => $request->domain,
+
                 // Add other company fields as needed
             ]);
 
             return response()->json([
                 'message' => 'Company registered successfully',
                 'company' => $company,
-                'token' => $company->createToken('company-token')->plainTextToken,
+                // 'token' => $company->createToken('company-token')->plainTextToken,
             ]);
         }
 

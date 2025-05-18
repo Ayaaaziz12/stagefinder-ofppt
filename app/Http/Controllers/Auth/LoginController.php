@@ -14,12 +14,15 @@ class LoginController extends Controller
 {
     public function login(Request $request)
     {
+
         $request->validate([
             'student_checkbox' => 'sometimes|boolean',
-            'company_checkbox' => 'sometimes|boolean',
-            'email' => 'required_if:student_checkbox,true|email',
-            'rc' => 'required_if:company_checkbox,true|string',
-            'password' => 'required|string',
+            // 'company_checkbox' => 'sometimes|boolean',
+            'email_student' => 'required_if:student_checkbox,true|email',
+            'password_student' => 'required_if:student_checkbox,true|string',
+            // 'email_company' => 'required_if:company_checkbox,true|email',
+            // 'password_company' => 'required_if:company_checkbox,true|string',
+            // 'rc' => 'required_if:company_checkbox,true|string'
         ]);
 
         // Validate checkbox exclusivity
