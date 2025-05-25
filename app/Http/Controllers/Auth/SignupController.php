@@ -29,20 +29,49 @@ class SignupController extends Controller
                 // Student fields
                 'first_name' => 'required_if:student_checkbox,true|string',
                 'last_name' => 'required_if:student_checkbox,true|string',
-                'email' => 'required_if:student_checkbox,true|email|unique:students,email',
+                'email' => [
+                    'required_if:student_checkbox,true',
+                    'email',
+                    'unique:students,email',
+                    function ($attribute, $value, $fail) {
+                        if (Company::where('email', $value)->exists()) {
+                            $fail('This email is already registered as a company. Please use a different email.');
+                        }
+                    }
+                ],
                 'password' => 'required_if:student_checkbox,true||string|confirmed',
-                'phone' => 'required_if:student_checkbox,true|string',
+                'phone' => 'required_if:student_checkbox,true|string|unique:students,phone',
 
                 // Company fields
                 'name' => 'required_if:company_checkbox,true|string|unique:companies,name',
                 'rc' => 'required_if:company_checkbox,true|string',
                 'company_password' => 'required_if:company_checkbox,true|string|confirmed',
-                'email' => 'required_if:company_checkbox,true|email|unique:companies,email',
+                'email' => [
+                    'required_if:company_checkbox,true',
+                    'email',
+                    'unique:companies,email',
+                    function ($attribute, $value, $fail) {
+                        if (Student::where('email', $value)->exists()) {
+                            $fail('This email is already registered as a student. Please use a different email.');
+                        }
+                    }
+                ],
                 'domain' => 'required_if:company_checkbox,true|string',
                 'address' => 'required_if:company_checkbox,true|string',
                 'country' => 'required_if:company_checkbox,true|string',
                 'ville' => 'required_if:company_checkbox,true|string',
                 'date' => 'required_if:company_checkbox,true|date'
+            ], [
+                'email.unique' => 'This email address is already registered. Please use a different email or try logging in.',
+                'email.required_if' => 'Email is required for registration.',
+                'email.email' => 'Please provide a valid email address.',
+                'phone.required_if' => 'Phone number is required.',
+                'phone.string' => 'Please provide a valid phone number.',
+                'phone.unique' => 'This phone number is already registered. Please use a different phone number.',
+                'password.required_if' => 'Password is required for registration.',
+                'password.confirmed' => 'Password confirmation does not match.',
+                'first_name.required_if' => 'First name is required.',
+                'last_name.required_if' => 'Last name is required.'
             ]);
 
             // Validate checkbox exclusivity
