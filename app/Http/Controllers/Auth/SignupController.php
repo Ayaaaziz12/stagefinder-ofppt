@@ -29,7 +29,7 @@ class SignupController extends Controller
                 // Student fields
                 'first_name' => 'required_if:student_checkbox,true|string',
                 'last_name' => 'required_if:student_checkbox,true|string',
-                'email' => [
+                'email_student' => [
                     'required_if:student_checkbox,true',
                     'email',
                     'unique:students,email',
@@ -39,7 +39,7 @@ class SignupController extends Controller
                         }
                     }
                 ],
-                'password' => 'required_if:student_checkbox,true||string|confirmed',
+                'password_student' => 'required_if:student_checkbox,true|string|min:6',
                 'phone' => 'required_if:student_checkbox,true|string|unique:students,phone',
 
                 // Company fields
@@ -62,16 +62,16 @@ class SignupController extends Controller
                 'ville' => 'required_if:company_checkbox,true|string',
                 'date' => 'required_if:company_checkbox,true|date'
             ], [
-                'email.unique' => 'This email address is already registered. Please use a different email or try logging in.',
-                'email.required_if' => 'Email is required for registration.',
-                'email.email' => 'Please provide a valid email address.',
-                'phone.required_if' => 'Phone number is required.',
+                'email_student.unique' => 'This email address is already registered. Please use a different email or try logging in.',
+                'email_student.required_if' => 'Email is required for student registration.',
+                'email_student.email' => 'Please provide a valid email address.',
+                'phone.required_if' => 'Phone number is required for student registration.',
                 'phone.string' => 'Please provide a valid phone number.',
                 'phone.unique' => 'This phone number is already registered. Please use a different phone number.',
-                'password.required_if' => 'Password is required for registration.',
-                'password.confirmed' => 'Password confirmation does not match.',
-                'first_name.required_if' => 'First name is required.',
-                'last_name.required_if' => 'Last name is required.'
+                'password_student.required_if' => 'Password is required for student registration.',
+                'password_student.min' => 'Password must be at least 6 characters long.',
+                'first_name.required_if' => 'First name is required for student registration.',
+                'last_name.required_if' => 'Last name is required for student registration.'
             ]);
 
             // Validate checkbox exclusivity
@@ -86,8 +86,8 @@ class SignupController extends Controller
                 $student = Student::create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
+                    'email' => $request->email_student,
+                    'password' => Hash::make($request->password_student),
                     'phone' => $request->phone,
                 ]);
 
