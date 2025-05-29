@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /**
  * Class Company
@@ -30,8 +32,10 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Company extends Model
+class Company extends Authenticatable implements JWTSubject
 {
+    use Notifiable;
+
     protected $table = 'companies';
     public $timestamps = false;
 
@@ -61,6 +65,17 @@ class Company extends Model
         'id_rc'
     ];
 
+    // JWT Required Methods
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+
     public function rc()
     {
         return $this->belongsTo(Rc::class, 'id_rc');
@@ -69,5 +84,10 @@ class Company extends Model
     public function offers()
     {
         return $this->hasMany(Offer::class, 'id_company');
+    }
+
+    public function blacklists()
+    {
+        return $this->hasMany(Blacklist::class, 'IdCompany');
     }
 }

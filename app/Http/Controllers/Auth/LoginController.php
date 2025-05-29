@@ -18,70 +18,61 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        try {
-            $request->validate([
-                'student_checkbox' => 'sometimes|boolean',
-                'company_checkbox' => 'sometimes|boolean',
-                'email_student' => 'required_if:student_checkbox,true|email',
-                'password_student' => 'required_if:student_checkbox,true|string',
-                'email_company' => 'required_if:company_checkbox,true|email',
-                'password_company' => 'required_if:company_checkbox,true|string',
-                'rc' => 'required_if:company_checkbox,true|string'
-            ]);
 
-            // Validate checkbox exclusivity
-            if ($request->student_checkbox && $request->company_checkbox) {
-                return response()->json([
-                    'error' => 'Cannot select both student and company login.'
-                ], 422);
-            }
+        $request->validate([
+            'student_checkbox' => 'sometimes|boolean',
+            'company_checkbox' => 'sometimes|boolean',
+            'email_student' => 'required_if:student_checkbox,true|email',
+            'password_student' => 'required_if:student_checkbox,true|string',
+            'email_company' => 'required_if:company_checkbox,true|email',
+            'password_company' => 'required_if:company_checkbox,true|string',
+            'rc' => 'required_if:company_checkbox,true|string'
+        ]);
 
-            // Student Login
-            if ($request->student_checkbox) {
-                $credentials = [
-                    'email' => $request->email_student,
-                    'password' => $request->password_student
-                ];
-
-                if (!$token = auth('student')->attempt($credentials)) {
-                    return response()->json([
-                        'error' => 'Invalid student credentials.'
-                    ], 401);
-                }
-
-                $user = auth('student')->user();
-                return $this->respondWithToken($token, 'student', $user);
-            }
-
-            // Company Login
-            if ($request->company_checkbox) {
-                $credentials = [
-                    'rc' => $request->rc,
-                    'password' => $request->password_company
-                ];
-
-                if (!$token = auth('company')->attempt($credentials)) {
-                    return response()->json([
-                        'error' => 'Invalid company credentials.'
-                    ], 401);
-                }
-
-                $user = auth('company')->user();
-                return $this->respondWithToken($token, 'company', $user);
-            }
-
+        // Validate checkbox exclusivity
+        if ($request->student_checkbox && $request->company_checkbox) {
             return response()->json([
-                'error' => 'Please select student or company login.'
+                'error' => 'Cannot select both student and company login.'
             ], 422);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'error' => $e->errors()
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred during login.'
-            ], 500);
         }
+
+        // Student Login
+        if ($request->student_checkbox) {
+            $credentials = [
+                'email' => $request->email_student,
+                'password' => $request->password_student
+            ];
+
+            if (!$token = auth('student')->attempt($credentials)) {
+                return response()->json([
+                    'error' => 'Invalid student credentials.'
+                ], 401);
+            }
+
+            $user = auth('student')->user();
+            return $this->respondWithToken($token, 'student', $user);
+        }
+
+        // Company Login
+        if ($request->company_checkbox) {
+            $credentials = [
+                'id_rc' => $request->rc,
+                'password' => $request->password_company
+            ];
+
+            if (!$token = auth('company')->attempt($credentials)) {
+                return response()->json([
+                    'error' => 'Invalid company credentials.'
+                ], 401);
+            }
+
+            $user = auth('company')->user();
+            return $this->respondWithToken($token, 'company', $user);
+        }
+
+        return response()->json([
+            'error' => 'Please select student or company login.'
+        ], 422);
     }
 
     protected function respondWithToken($token, $userType, $user)
