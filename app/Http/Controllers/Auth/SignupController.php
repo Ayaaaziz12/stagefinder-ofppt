@@ -43,7 +43,7 @@ class SignupController extends Controller
                 'phone' => 'required_if:student_checkbox,true|string|unique:students,phone',
 
                 // Company fields
-                'name' => 'required_if:company_checkbox,true|string|unique:companies,name',
+                'name' => 'required_if:company_checkbox,true|string',
                 'rc' => 'required_if:company_checkbox,true|string',
                 'company_password' => 'required_if:company_checkbox,true|string|confirmed',
                 'email' => [
