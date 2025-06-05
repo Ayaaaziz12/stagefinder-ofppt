@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SignupController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\SavedOfferController;
+use App\Http\Controllers\JobTypeController;
+use App\Http\Controllers\OffreStatusController;
 
 
 
@@ -40,7 +42,7 @@ Route::middleware('auth:student')->group(function () {
 });
 
 Route::middleware('auth:company')->group(function () {
-    Route::post('/offers', [OfferController::class, 'store']);
+    Route::post('/Addoffers', [OfferController::class, 'store']);
     Route::put('/offers/{offer}', [OfferController::class, 'update']);
     Route::delete('/offers/{offerId}', [OfferController::class, 'destroy']);
     Route::get('/offers/{offerId}', [OfferController::class, 'show']);
@@ -64,3 +66,7 @@ Route::middleware('auth:student')->group(function () {
     Route::post('/applications', [ApplicationController::class, 'store']);
     // Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
 });
+
+// Public routes
+Route::get('/job-types', [JobTypeController::class, 'index']);
+Route::get('/offer-statuses', [OffreStatusController::class, 'index']);

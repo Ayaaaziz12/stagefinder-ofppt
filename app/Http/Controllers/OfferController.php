@@ -20,33 +20,54 @@ class OfferController extends Controller
     // Create new offer (company only)
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'Job_Descriptin' => 'required|string',
-            'expiration_date' => 'required|date|after:today',
-            'max_applications' => 'required|integer|min:1',
-            'id_JobType' => [
-                'required',
-                Rule::exists('jobtypes', 'id')
-            ],
-            'id_OffreStatus' => [
-                'sometimes',
-                Rule::exists('offrestatuses', 'id')
-            ]
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'Job_Descriptin' => 'required|string',
+                'skills' => 'required|string',
+                'expiration_date' => 'required|date|after:today',
+                'max_applications' => 'required|integer|min:1',
+                'id_JobType' => [
+                    'required',
+                    Rule::exists('jobtypes', 'id')
+                ],
+                'id_OffreStatus' => [
+                    'sometimes',
+                    Rule::exists('offrestatuses', 'id')
+                ]
+            ]);
 
-        $offer = Offer::create([
-            'title' => $request->title,
-            'Job_Descriptin' => $request->Job_Descriptin,
-            'date' => now(), // Auto-set creation date
-            'expiration_date' => $request->expiration_date,
-            'max_applications' => $request->max_applications,
-            'id_company' => Auth::guard('company')->user()->id,
-            'id_JobType' => $request->id_JobType,
-            'id_OffreStatus' => $request->id_OffreStatus
-        ]);
+            $company = Auth::guard('company')->user();
+            if (!$company) {
+                return response()->json(['error' => 'Unauthorized. Company authentication required.'], 401);
+            }
 
-        return response()->json($offer->load(['company', 'jobtype', 'offrestatus']), 201);
+            $offer = Offer::create([
+                'title' => $validated['title'],
+                'Job_Descriptin' => $validated['Job_Descriptin'],
+                'skills' => $validated['skills'],
+                'expiration_date' => $validated['expiration_date'],
+                'max_applications' => $validated['max_applications'],
+                'id_company' => $company->id,
+                'id_JobType' => $validated['id_JobType'],
+                'id_OffreStatus' => $validated['id_OffreStatus'] ?? null
+            ]);
+
+            return response()->json([
+                'message' => 'Offer created successfully',
+                'offer' => $offer->load(['company', 'jobtype', 'offrestatus'])
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create offer',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // Get single offer with relationships
@@ -69,7 +90,6 @@ class OfferController extends Controller
         $request->validate([
             'title' => 'sometimes|string|max:255',
             'Job_Descriptin' => 'sometimes|string',
-            'expiration_date' => 'sometimes|date|after:today',
             'max_applications' => 'sometimes|integer|min:1',
             'id_JobType' => [
                 'sometimes',

@@ -11,17 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Jobtype
- * 
+ *
  * @property int $id
  * @property string $Libelle
- * 
+ *
  * @property Collection|Offer[] $offers
  *
  * @package App\Models
  */
 class Jobtype extends Model
 {
-	protected $table = 'jobtype';
+	protected $table = 'jobtypes';
 	public $timestamps = false;
 
 	protected $fillable = [

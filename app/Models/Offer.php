@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Offer
- * 
+ *
  * @property int $id
  * @property string $title
  * @property string $Job_Descriptin
@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id_JobType
  * @property int $id_OffreStatus
  * @property Carbon|null $created_at
- * 
+ *
  * @property Company $company
  * @property Jobtype $jobtype
  * @property Offrestatus $offrestatus
@@ -39,8 +39,7 @@ class Offer extends Model
 	public $timestamps = false;
 
 	protected $casts = [
-		'date' => 'datetime',
-		'expiration_date' => 'datetime',
+		'expiration_date' => 'date',
 		'max_applications' => 'int',
 		'id_company' => 'int',
 		'id_JobType' => 'int',
@@ -50,7 +49,7 @@ class Offer extends Model
 	protected $fillable = [
 		'title',
 		'Job_Descriptin',
-		'date',
+		'skills',
 		'expiration_date',
 		'max_applications',
 		'id_company',
