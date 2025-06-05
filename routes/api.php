@@ -43,8 +43,8 @@ Route::middleware('auth:student')->group(function () {
 
 Route::middleware('auth:company')->group(function () {
     Route::post('/Addoffers', [OfferController::class, 'store']);
-    Route::put('/offers/{offer}', [OfferController::class, 'update']);
-    Route::delete('/offers/{offerId}', [OfferController::class, 'destroy']);
+    Route::put('/EditOffer/{offer}', [OfferController::class, 'update']);
+    Route::delete('/deleteoffer/{offerId}', [OfferController::class, 'destroy']);
     Route::get('/offers/{offerId}', [OfferController::class, 'show']);
 });
 
