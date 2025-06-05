@@ -12,9 +12,44 @@ use Illuminate\Validation\Rule;
 class OfferController extends Controller
 {
     // Get all offers with relationships
-    public function index()
+    public function index(Request $request)
     {
-        return Offer::with(['company', 'jobtype', 'offrestatus'])->get();
+        $query = Offer::with(['company', 'jobtype', 'offrestatus']);
+
+        // Filter by job type if provided
+        if ($request->has('job_type_id')) {
+            $query->where('id_JobType', $request->job_type_id);
+        }
+
+        // Filter by company if provided
+        if ($request->has('company_id')) {
+            $query->where('id_company', $request->company_id);
+        }
+
+        // Filter by status if provided
+        if ($request->has('status_id')) {
+            $query->where('id_OffreStatus', $request->status_id);
+        }
+
+        // Filter by search term if provided
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('Job_Descriptin', 'like', "%{$search}%")
+                    ->orWhere('skills', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort by date (newest first)
+        $query->orderBy('created_at', 'desc');
+
+        $offers = $query->get();
+
+        return response()->json([
+            'message' => 'Offers retrieved successfully',
+            'offers' => $offers
+        ]);
     }
 
     // Create new offer (company only)
