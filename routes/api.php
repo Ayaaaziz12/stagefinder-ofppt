@@ -68,8 +68,8 @@ Route::middleware('auth:student')->group(function () {
 });
 
 // Public routes
-Route::get('/job-types', [JobTypeController::class, 'index']);
-Route::get('/offer-statuses', [OffreStatusController::class, 'index']);
+Route::get('/jobtypes', [JobTypeController::class, 'index']);
+Route::get('/offrestatus', [OffreStatusController::class, 'index']);
 
 // Protected routes (require authentication)
 Route::middleware('auth:company,student')->group(function () {
