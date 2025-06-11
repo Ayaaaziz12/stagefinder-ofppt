@@ -63,7 +63,8 @@ class Student extends Authenticatable implements JWTSubject
         'ville',
         'password',
         'profile_picture',
-        'registration_date'
+        'registration_date',
+        'skills'
     ];
 
     // JWT Required Methods
