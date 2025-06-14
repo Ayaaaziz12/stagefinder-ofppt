@@ -14,34 +14,66 @@ class SavedOfferController extends Controller
     // Get all saved offers for current student
     public function index()
     {
-        $student = Auth::guard('student')->user();
-        return $student->$student::with(['offer.company', 'offer.jobtype'])
-            ->get();
+        try {
+            $student = Auth::guard('student')->user();
+            if (!$student) {
+                return response()->json(['error' => 'Unauthorized. Student authentication required.'], 401);
+            }
+
+            $savedOffers = SavedOffer::where('id_student', $student->id)
+                ->with(['offer.company', 'offer.jobtype'])
+                ->get();
+
+            return response()->json($savedOffers);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to fetch saved offers',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // Save an offer (student only)
     public function store(Request $request)
     {
-        $request->validate([
-            'offer_id' => 'required|exists:offers,id'
-        ]);
+        try {
+            $student = Auth::guard('student')->user();
+            if (!$student) {
+                return response()->json(['error' => 'Unauthorized. Student authentication required.'], 401);
+            }
 
-        $student = Auth::guard('student')->user();
-
-        // Check if already saved
-        if ($student->$student()->where('id_offre', $request->offer_id)->exists()) {
-            throw ValidationException::withMessages([
-                'offer_id' => ['This offer is already saved.']
+            $validated = $request->validate([
+                'id_offre' => 'required|exists:offers,id'
             ]);
+
+            // Check if offer is already saved
+            $existingSave = SavedOffer::where('id_student', $student->id)
+                ->where('id_offre', $validated['id_offre'])
+                ->first();
+
+            if ($existingSave) {
+                return response()->json([
+                    'message' => 'Offer already saved',
+                    'saved' => true
+                ]);
+            }
+
+            $savedOffer = SavedOffer::create([
+                'id_student' => $student->id,
+                'id_offre' => $validated['id_offre']
+            ]);
+
+            return response()->json([
+                'message' => 'Offer saved successfully',
+                'saved' => true,
+                'saved_offer' => $savedOffer
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to save offer',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $savedOffer = SavedOffer::create([
-            'id_student' => $student->id,
-            'id_offre' => $request->offer_id,
-            'date' => now()
-        ]);
-
-        return response()->json($savedOffer->load('offer'), 201);
     }
 
     // Check if offer is saved
@@ -56,15 +88,33 @@ class SavedOfferController extends Controller
     }
 
     // Remove saved offer
-    public function destroy($savedOfferId)
+    public function destroy($offerId)
     {
-        $savedOffer = SavedOffer::findOrFail($savedOfferId);
+        try {
+            $student = Auth::guard('student')->user();
+            if (!$student) {
+                return response()->json(['error' => 'Unauthorized. Student authentication required.'], 401);
+            }
 
-        if ($savedOffer->id_student != Auth::guard('student')->user()->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            $savedOffer = SavedOffer::where('id_student', $student->id)
+                ->where('id_offre', $offerId)
+                ->first();
+
+            if (!$savedOffer) {
+                return response()->json(['message' => 'Offer not found in saved offers'], 404);
+            }
+
+            $savedOffer->delete();
+
+            return response()->json([
+                'message' => 'Offer unsaved successfully',
+                'saved' => false
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to unsave offer',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $savedOffer->delete();
-        return response()->json(null, 204);
     }
 }

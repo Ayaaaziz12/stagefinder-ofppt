@@ -11,6 +11,7 @@ use App\Http\Controllers\JobTypeController;
 use App\Http\Controllers\OffreStatusController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\JobListingController;
 
 
 
@@ -80,8 +81,14 @@ Route::middleware('auth:student')->group(function () {
 // Public routes
 Route::get('/jobtypes', [JobTypeController::class, 'index']);
 Route::get('/offrestatus', [OffreStatusController::class, 'index']);
+Route::get('/job-listings', [JobListingController::class, 'index']);
 
 // Protected routes (require authentication)
 Route::middleware('auth:company,student')->group(function () {
     Route::get('/offers', [OfferController::class, 'index']);
+});
+
+// Saved Offers Routes
+Route::middleware('auth:student')->group(function () {
+    Route::post('/saved-offers', [SavedOfferController::class, 'store']);
 });

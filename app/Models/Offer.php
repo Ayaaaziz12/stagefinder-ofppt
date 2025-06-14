@@ -43,7 +43,8 @@ class Offer extends Model
 		'max_applications' => 'int',
 		'id_company' => 'int',
 		'id_JobType' => 'int',
-		'id_OffreStatus' => 'int'
+		'id_OffreStatus' => 'int',
+		'created_at' => 'datetime'
 	];
 
 	protected $fillable = [
