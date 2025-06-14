@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Company
@@ -24,45 +27,42 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string|null $website
  * @property string|null $logo
  * @property string|null $description
- * @property int|null $id_rc
+ * @property string $rc
  * @property Carbon|null $created_at
  *
- * @property Rc|null $rc
  * @property Collection|Offer[] $offers
  *
  * @package App\Models
  */
 class Company extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
+    protected $guard = 'company';
     protected $table = 'companies';
     public $timestamps = false;
 
     protected $casts = [
         'date' => 'datetime',
         'is_verified' => 'bool',
-        'id_rc' => 'int'
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     protected $hidden = [
-        'password'
+        'password',
+        'remember_token',
     ];
 
     protected $fillable = [
         'name',
-        'address',
         'email',
-        'date',
+        'password',
+        'domain',
+        'address',
         'country',
         'ville',
-        'domain',
-        'is_verified',
-        'password',
-        'website',
-        'logo',
-        'description',
-        'id_rc'
+        'rc',
     ];
 
     // JWT Required Methods
@@ -74,11 +74,6 @@ class Company extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
-    }
-
-    public function rc()
-    {
-        return $this->belongsTo(Rc::class, 'id_rc');
     }
 
     public function offers()

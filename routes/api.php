@@ -10,6 +10,7 @@ use App\Http\Controllers\SavedOfferController;
 use App\Http\Controllers\JobTypeController;
 use App\Http\Controllers\OffreStatusController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CompanyController;
 
 
 
@@ -35,6 +36,8 @@ Route::middleware('auth:company')->group(function () {
     Route::get('/company/profile', function () {
         return auth('company')->user(); // Returns logged-in company
     });
+    Route::get('/company/{id}', [CompanyController::class, 'show']);
+    Route::put('/company/profile', [CompanyController::class, 'update']);
     Route::post('/Addoffers', [OfferController::class, 'store']);
     Route::put('/EditOffer/{offer}', [OfferController::class, 'update']);
     Route::delete('/deleteoffer/{offerId}', [OfferController::class, 'destroy']);

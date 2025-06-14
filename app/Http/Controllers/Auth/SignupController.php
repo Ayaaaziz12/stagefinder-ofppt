@@ -99,19 +99,12 @@ class SignupController extends Controller
 
             // Register Company
             if ($request->company_checkbox) {
-                Log::info('Creating RC record', ['rc_value' => $request->rc]);
+                Log::info('Creating company with RC', ['rc_value' => $request->rc]);
 
-                // First create the RC record
-                $rc = Rc::create([
-                    'value' => $request->rc
-                ]);
-
-                Log::info('RC record created', ['rc_id' => $rc->id]);
-
-                // Then create the company with the RC ID
+                // Create the company with RC as a string
                 $company = Company::create([
                     'name' => $request->name,
-                    'id_rc' => $rc->id,
+                    'rc' => $request->rc,
                     'password' => Hash::make($request->company_password),
                     'email' => $request->email,
                     'domain' => $request->domain,

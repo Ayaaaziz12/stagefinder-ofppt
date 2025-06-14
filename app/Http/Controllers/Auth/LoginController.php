@@ -56,7 +56,7 @@ class LoginController extends Controller
         // Company Login
         if ($request->company_checkbox) {
             $credentials = [
-                'id_rc' => $request->rc,
+                'rc' => $request->rc,
                 'password' => $request->password_company
             ];
 
