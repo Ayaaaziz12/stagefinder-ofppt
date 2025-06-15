@@ -12,6 +12,7 @@ use App\Http\Controllers\OffreStatusController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\JobListingController;
+use App\Http\Controllers\StudentController;
 
 
 
@@ -27,9 +28,17 @@ Route::post('/signup', [SignupController::class, 'register']);
 
 // Student routes
 Route::middleware('auth:student')->group(function () {
-    Route::get('/student/profile', function () {
-        return auth('student')->user(); // Returns logged-in student
-    });
+    // Student Profile Routes
+    Route::get('/student/profile', [StudentController::class, 'show']);
+    Route::put('/student/profile', [StudentController::class, 'update']);
+
+    // Other student routes
+    Route::get('/saved-offers', [SavedOfferController::class, 'index']);
+    Route::post('/saved-offers', [SavedOfferController::class, 'store']);
+    Route::get('/saved-offers/{offerId}', [SavedOfferController::class, 'show']);
+    Route::delete('/saved-offers/{savedOfferId}', [SavedOfferController::class, 'destroy']);
+    Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::post('/applications', [ApplicationController::class, 'store']);
 });
 
 // Company routes
@@ -59,24 +68,6 @@ Route::middleware('auth:company')->group(function () {
     Route::get('/offers/{offerId}', [OfferController::class, 'show']);
 });
 
-
-// Student-protected routes
-Route::middleware('auth:student')->group(function () {
-    // Saved Offers
-    Route::get('/saved-offers', [SavedOfferController::class, 'index']);
-    Route::post('/saved-offers', [SavedOfferController::class, 'store']);
-    Route::get('/saved-offers/{offerId}', [SavedOfferController::class, 'show']);
-    Route::delete('/saved-offers/{savedOfferId}', [SavedOfferController::class, 'destroy']);
-});
-
-
-
-// Student applications
-Route::middleware('auth:student')->group(function () {
-    Route::get('/applications', [ApplicationController::class, 'index']);
-    Route::post('/applications', [ApplicationController::class, 'store']);
-    // Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']);
-});
 
 // Public routes
 Route::get('/jobtypes', [JobTypeController::class, 'index']);

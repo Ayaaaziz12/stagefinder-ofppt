@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasColumn('offers', 'date')) {
-            Schema::table('offers', function (Blueprint $table) {
-                $table->dropColumn('date');
+        if (!Schema::hasColumn('companies', 'rc')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->string('rc')->nullable()->after('name');
             });
         }
     }
@@ -23,9 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasColumn('offers', 'date')) {
-            Schema::table('offers', function (Blueprint $table) {
-                $table->date('date')->nullable();
+        if (Schema::hasColumn('companies', 'rc')) {
+            Schema::table('companies', function (Blueprint $table) {
+                $table->dropColumn('rc');
             });
         }
     }

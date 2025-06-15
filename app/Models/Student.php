@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Class Student
@@ -38,16 +40,23 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  */
 class Student extends Authenticatable implements JWTSubject
 {
+    use HasApiTokens, Notifiable;
+
+    protected $guard = 'student';
+
     protected $table = 'students';
     public $timestamps = false;
 
     protected $casts = [
         'date_birth' => 'datetime',
-        'registration_date' => 'datetime'
+        'registration_date' => 'datetime',
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     protected $hidden = [
-        'password'
+        'password',
+        'remember_token',
     ];
 
     protected $fillable = [
@@ -64,7 +73,8 @@ class Student extends Authenticatable implements JWTSubject
         'password',
         'profile_picture',
         'registration_date',
-        'skills'
+        'skills',
+        'date_of_birth'
     ];
 
     // JWT Required Methods

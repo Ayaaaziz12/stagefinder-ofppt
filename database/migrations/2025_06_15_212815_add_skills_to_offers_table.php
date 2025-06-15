@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasColumn('offers', 'date')) {
+        if (!Schema::hasColumn('offers', 'skills')) {
             Schema::table('offers', function (Blueprint $table) {
-                $table->dropColumn('date');
+                $table->text('skills')->nullable()->after('Job_Descriptin');
             });
         }
     }
@@ -23,9 +23,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasColumn('offers', 'date')) {
+        if (Schema::hasColumn('offers', 'skills')) {
             Schema::table('offers', function (Blueprint $table) {
-                $table->date('date')->nullable();
+                $table->dropColumn('skills');
             });
         }
     }
