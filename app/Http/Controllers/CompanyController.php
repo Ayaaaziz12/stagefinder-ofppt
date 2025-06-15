@@ -45,11 +45,15 @@ class CompanyController extends Controller
                 'country',
                 'ville',
                 'rc',
-                'date',
                 'website',
                 'logo',
                 'description'
             ]);
+
+            // Format the date if it exists
+            if ($request->has('date')) {
+                $updateData['date'] = date('Y-m-d', strtotime($request->date));
+            }
 
             // If password is provided, hash it
             if ($request->has('password')) {

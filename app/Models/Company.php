@@ -43,7 +43,7 @@ class Company extends Authenticatable implements JWTSubject
     public $timestamps = false;
 
     protected $casts = [
-        'date' => 'datetime',
+        'date' => 'datetime:Y-m-d',
         'is_verified' => 'bool',
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
