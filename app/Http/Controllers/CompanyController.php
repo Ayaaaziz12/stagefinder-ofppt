@@ -29,6 +29,10 @@ class CompanyController extends Controller
                 'country' => 'sometimes|string|max:255',
                 'ville' => 'sometimes|string|max:255',
                 'rc' => 'sometimes|string|max:255',
+                'date' => 'sometimes|date',
+                'website' => 'sometimes|nullable|url|max:255',
+                'logo' => 'sometimes|nullable|url|max:255',
+                'description' => 'sometimes|nullable|string',
                 'password' => 'sometimes|string|min:6|confirmed',
             ]);
 
@@ -40,7 +44,11 @@ class CompanyController extends Controller
                 'address',
                 'country',
                 'ville',
-                'rc'
+                'rc',
+                'date',
+                'website',
+                'logo',
+                'description'
             ]);
 
             // If password is provided, hash it

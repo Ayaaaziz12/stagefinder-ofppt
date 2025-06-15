@@ -63,6 +63,11 @@ class Company extends Authenticatable implements JWTSubject
         'country',
         'ville',
         'rc',
+        'date',
+        'website',
+        'logo',
+        'description',
+        'is_verified'
     ];
 
     // JWT Required Methods
