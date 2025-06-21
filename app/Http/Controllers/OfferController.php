@@ -150,6 +150,9 @@ class OfferController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // Delete all saved offers linked to this offer
+        \App\Models\SavedOffer::where('id_offre', $offerId)->delete();
+
         $offer->delete();
         return response()->json([
             'message' => 'Offer deleted successfully',
