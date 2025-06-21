@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 class SavedOfferController extends Controller
 {
     // Get all saved offers for current student
-    public function index()
+    public function index(Request $request)
     {
         try {
             $student = Auth::guard('student')->user();
@@ -20,9 +20,20 @@ class SavedOfferController extends Controller
                 return response()->json(['error' => 'Unauthorized. Student authentication required.'], 401);
             }
 
-            $savedOffers = SavedOffer::where('id_student', $student->id)
-                ->with(['offer.company', 'offer.jobtype'])
-                ->get();
+            $query = SavedOffer::where('id_student', $student->id)
+                ->with(['offer.company', 'offer.jobtype']);
+
+            // Add search functionality
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $query->whereHas('offer', function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('Job_Descriptin', 'like', "%{$search}%")
+                        ->orWhere('skills', 'like', "%{$search}%");
+                });
+            }
+
+            $savedOffers = $query->get();
 
             return response()->json($savedOffers);
         } catch (\Exception $e) {

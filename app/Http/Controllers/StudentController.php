@@ -34,6 +34,7 @@ class StudentController extends Controller
                 'skills' => 'sometimes|string',
                 'profile_picture' => 'sometimes|nullable|url|max:255',
                 'password' => 'sometimes|string|min:6|confirmed',
+                'new_profile_pic' => 'nullable',
             ]);
 
             // Update student information
@@ -51,6 +52,15 @@ class StudentController extends Controller
                 'profile_picture'
             ]);
 
+            // Handle new_profile_pic as binary
+            if ($request->has('new_profile_pic')) {
+                $base64Image = $request->new_profile_pic;
+                if (preg_match('/^data:image\\/[a-zA-Z]+;base64,/', $base64Image)) {
+                    $base64Image = preg_replace('/^data:image\\/[a-zA-Z]+;base64,/', '', $base64Image);
+                }
+                $updateData['new_profile_pic'] = base64_decode($base64Image);
+            }
+
             // If password is provided, hash it
             if ($request->has('password')) {
                 $updateData['password'] = Hash::make($request->password);
@@ -63,6 +73,14 @@ class StudentController extends Controller
 
             // Get updated student data
             $updatedStudent = Student::find($student->id);
+
+            // Convert binary to base64 for JSON response
+            if ($updatedStudent->new_profile_pic) {
+                if (is_resource($updatedStudent->new_profile_pic)) {
+                    $updatedStudent->new_profile_pic = stream_get_contents($updatedStudent->new_profile_pic);
+                }
+                $updatedStudent->new_profile_pic = 'data:image/jpeg;base64,' . base64_encode($updatedStudent->new_profile_pic);
+            }
 
             return response()->json([
                 'message' => 'Student information updated successfully',
@@ -85,11 +103,17 @@ class StudentController extends Controller
                 if (!$student) {
                     return response()->json(['error' => 'Unauthorized. Student authentication required.'], 401);
                 }
+                if ($student->new_profile_pic) {
+                    $student->new_profile_pic = 'data:image/jpeg;base64,' . base64_encode($student->new_profile_pic);
+                }
                 return response()->json($student);
             }
 
             // If ID is provided, return that specific student's profile
             $student = Student::findOrFail($id);
+            if ($student->new_profile_pic) {
+                $student->new_profile_pic = 'data:image/jpeg;base64,' . base64_encode($student->new_profile_pic);
+            }
             return response()->json($student);
         } catch (\Exception $e) {
             return response()->json([
